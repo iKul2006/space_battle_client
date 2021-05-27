@@ -10,7 +10,15 @@
         android:screenOrientation="landscape"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Battle"></activity>
+        <activity android:name=".BattleResult"></activity>
+
+        <service
+            android:name=".MediaService"
+            android:enabled="true"
+            android:stopWithTask="true"/>
+
+        <activity android:name=".Settings"/>
+        <activity android:name=".Battle" />
         <activity android:name=".Arrange" />
         <activity android:name=".Registration" />
         <activity android:name=".ProfileActivity" />

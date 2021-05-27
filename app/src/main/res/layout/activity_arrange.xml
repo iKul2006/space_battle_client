@@ -9,11 +9,24 @@
     tools:context=".Arrange">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/conL"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:foreground="@drawable/image">
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <Button
+        android:id="@+id/btnRotate"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="128dp"
+        android:layout_marginBottom="24dp"
+        android:background="#00FFFFFF"
+        android:foreground="@android:drawable/ic_menu_rotate"
+        android:onClick="onClick"
+        app:layout_constraintBottom_toBottomOf="@+id/conL"
+        app:layout_constraintEnd_toEndOf="@+id/conL" />
 
     <Button
         android:id="@+id/btnPlay"

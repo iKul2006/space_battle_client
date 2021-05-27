@@ -1,21 +1,23 @@
-package com.example.myapplication;
+package com.example.myapplication.model;
 
 public class Player {
     public int id;
     public String name;
     public int victories;
     public int losses;
+    public int vsProgramVictories;
+    public int vsProgramLosses;
 
     public int levelExperience() {
-        int a = victories + losses;
-        int b = 0;
+        int sum = victories + losses;
+        double coefficient = 0;
         if (losses == 0)
-            b = 100;
+            coefficient = 1;
         else
-            b = 100 / a * victories;
+            coefficient = victories / losses;
 
-        if (a * b > 1)
-        return a * b;
+        if (sum * coefficient / 10 > 1)
+        return (int) (sum * coefficient / 10);
         else return 1;
     }
 }

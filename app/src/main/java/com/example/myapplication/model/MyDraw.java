@@ -11,19 +11,23 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.myapplication.Field;
+import com.example.myapplication.Arrange;
+import com.example.myapplication.model.Field;
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
-import com.example.myapplication.Spaceship;
+import com.example.myapplication.model.Spaceship;
 
 import static com.example.myapplication.model.Infrastructure.field;
 import static com.example.myapplication.model.Infrastructure.spaceships;
 
+//Класс расстоновки кораблей
 public class MyDraw extends View {
-    private Spaceship selectedSpaceship;
+    public Spaceship selectedSpaceship;
+    public Spaceship selectedForRotationSpaceship;
     private int cellX;
     private int cellY;
     private float x, y;
+    float cellSize;
     private boolean drawShip = false;
 
     public MyDraw(Context context) {
@@ -36,11 +40,10 @@ public class MyDraw extends View {
         super.onDraw(canvas);
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.FILL);
+        cellSize = Infrastructure.cellSize(canvas);
 
-
-
-        float cellSize = 60.8f;
-        field.draw(canvas, 32, 32, cellSize);
+        //Рисует поле для расстоновки кораблей
+        field.draw(canvas, cellSize / 2, cellSize / 2, cellSize);
 
         drawSpaceships(canvas, cellSize);
 
@@ -50,20 +53,25 @@ public class MyDraw extends View {
             if (!field.spaceshipsInField.contains(selectedSpaceship)) {
                 field.spaceshipsInField.add(selectedSpaceship);
             }
+
+            //Закрашивает ненужный корабль
             paint.setARGB(255, 55, 0, 179);
             paint.setStyle(Paint.Style.FILL_AND_STROKE);
             canvas.drawRect((float) selectedSpaceship.startX - 10, (float) selectedSpaceship.startY - 10,
-                    (float) (selectedSpaceship.startX + selectedSpaceship.cellCount * 60.8 + 10),
-                    (float) (selectedSpaceship.startY + 60.5 + 10), paint);
+                    (float) (selectedSpaceship.startX + selectedSpaceship.cellCount * cellSize + 10),
+                    (float) (selectedSpaceship.startY + cellSize + 10), paint);
             selectedSpaceship = null;
             cellX = -1;
             cellY = -1;
         }
+
+        //Отрисовывает корабли
         for (Spaceship ship : field.spaceshipsInField) {
             ship.draw(cellSize, canvas, ship.currentX, ship.currentY);
         }
     }
 
+    //Вычисляет, куда нажал пользователь и расставляет корабли
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
@@ -83,6 +91,7 @@ public class MyDraw extends View {
         if (selectedSpaceship != null && event.getAction() == MotionEvent.ACTION_UP) {
             if (checkXY(x, y)) {
                 drawShip = true;
+                selectedForRotationSpaceship = selectedSpaceship;
             } else {
                 selectedSpaceship = null;
                 Toast toast = Toast.makeText(getContext(),"Корабль размещен неверно", Toast.LENGTH_SHORT);
@@ -94,6 +103,7 @@ public class MyDraw extends View {
         return true;
     }
 
+    //Отрисовывает корабли
     private void drawSpaceships(Canvas canvas, double size) {
         for (int i = 0; i < spaceships.length; i++) {
             if (!field.spaceshipsInField.contains(spaceships[i])) {
@@ -101,20 +111,14 @@ public class MyDraw extends View {
             }
         }
     }
+
+    //Вычисляет, куда нажали относительно клеток
     private boolean checkXY(float x, float y) {
         Integer a = field.findCell(x, y).first;
         Integer b = field.findCell(x, y).second;
         cellX = a.intValue();
         cellY = b.intValue();
-        return cellX != -1 && selectedSpaceship.takeSpaceShipInField(cellX, cellY, field);
-    }
-
-    private void redrawSpaceship(Canvas canvas, Spaceship ship) {
-        Paint paint = new Paint();
-        paint.setARGB(255, 3, 218, 197);
-        paint.setStyle(Paint.Style.FILL);
-        ship.draw(60.8, canvas, (float) (field.startX + cellX * 60.8), (float) (field.startY + cellY * 60.8));
-
-
+        boolean result = cellX != -1 && selectedSpaceship.takeSpaceShipInField(cellX, cellY, field);
+        return result;
     }
 }
