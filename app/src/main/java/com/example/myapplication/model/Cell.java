@@ -4,13 +4,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+// Класс клетки поля
 public class Cell {
     private Field field;
     public int idSpaceShip;
-    public boolean isFired = false;
     public int cellX;
     public int cellY;
     public boolean isShooted = false;
+    public int damageSide = 1;
 
     public Cell(int cellX, int cellY, Field field) {
         this.field = field;
@@ -18,25 +19,27 @@ public class Cell {
         this.cellY = cellY;
     }
 
+    // Размер клетки
     private float getCellSize() {
-        return field.cellSize;
+        return field.getCellSize();
     }
 
-    //Находит начало клетки по X
+    // Находит координату X начала клетки
     private float getX() {
-        double newX = cellX * getCellSize() + field.startX;
+        double newX = cellX * getCellSize() + field.getStartX();
         float x = (float)newX;
         return x;
     }
 
-    //Находит начало клетки по Y
+    // Находит координату Y начала клетки
     private float getY() {
-        double newY = cellY * getCellSize() + field.startY;
+        double newY = cellY * getCellSize() + field.getStartY();
         float y = (float)newY;
         return y;
     }
 
-    public void fillCell(Canvas canvas, int color) {
+    // Рисует клетку на канве
+    private void drawCell(Canvas canvas, int color) {
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(color);
@@ -45,16 +48,17 @@ public class Cell {
         canvas.drawRect(x, y, x + getCellSize(), y + getCellSize(), paint);
     }
 
+    // Рисует клетку, когда в корабль "попали"
     public void fire(Canvas canvas) {
-        isFired = true;
-        fillCell(canvas, Color.RED);
+        drawCell(canvas, Color.RED);
+    }
+
+    // Рисует клетку, когда в корабль "не попали"
+    public void notFire(Canvas canvas) {
+        drawCell(canvas, Color.WHITE);
     }
 
     public void shoot() {
         isShooted = true;
-    }
-
-    public boolean isEmpty() {
-        return idSpaceShip == 0;
     }
 }

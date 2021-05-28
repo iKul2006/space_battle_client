@@ -1,13 +1,17 @@
 package com.example.myapplication.model;
 
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.hardware.Sensor;
+import android.hardware.display.DisplayManager;
 import android.text.Layout;
+import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 import android.widget.AlphabetIndexer;
 
 import com.example.myapplication.Arrange;
+import com.example.myapplication.MainActivity;
 import com.example.myapplication.model.Field;
 import com.example.myapplication.model.Player;
 import com.example.myapplication.model.Spaceship;
@@ -19,6 +23,7 @@ public class Infrastructure {
 
     public static Field field;
     public static Field adversaryField;
+    public static boolean isFinished = false;
 
     public static void createField() {
         field = new Field();
@@ -26,7 +31,7 @@ public class Infrastructure {
 
     public static Spaceship[] spaceships = createSpaceShips();
 
-    //Создает корабли для игрока
+    // Создает корабли для игрока
     public static Spaceship[] createSpaceShips() {
         //float size = Arrange.size; //Незаконченное исправление бага
         float size = 60.8f;
@@ -49,7 +54,7 @@ public class Infrastructure {
     }
     public static Spaceship[] adversarySpaceships = createSpaceShipsForAdversary();
 
-    //Создает корабли для соперника
+    // Создает корабли для соперника
     public static Spaceship[] createSpaceShipsForAdversary() {
         Spaceship[] adversarySpaceships = new Spaceship[10];
         adversarySpaceships[0] = new Spaceship(1, 4);
@@ -65,7 +70,7 @@ public class Infrastructure {
         return adversarySpaceships;
     }
 
-    //Проверяет введенное имя пользователся на то, что оно не пустое и не содержит пробелов
+    // Проверяет введенное имя пользователся на то, что оно не пустое и не содержит пробелов
     public static boolean checkName(String name) {
         if (name.isEmpty()) return false;
         for (int i = 0; i < name.length(); i++) {
@@ -75,9 +80,9 @@ public class Infrastructure {
         return true;
     }
 
-    //Вычисляет длину стороны клетки
+    // Вычисляет длину стороны клетки
     public static float cellSize(Canvas canvas) {
         int height = canvas.getHeight();
-        return height / 11;
+        return (float)height / 11;
     }
 }

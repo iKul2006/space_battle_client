@@ -7,16 +7,15 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.text.Layout;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.myapplication.model.Field;
 import com.example.myapplication.model.Infrastructure;
 import com.example.myapplication.model.MyDraw;
 import com.example.myapplication.model.Spaceship;
+import com.example.myapplication.model.SpaceshipState;
 
 import java.util.Random;
 
@@ -43,6 +42,7 @@ public class Arrange extends AppCompatActivity {
         Infrastructure.createAdversaryField();
         Infrastructure.createSpaceShips();
         Infrastructure.createSpaceShipsForAdversary();
+        Infrastructure.isFinished = false;
         myDraw = new MyDraw(this);
         lay.addView(myDraw,  new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT));
     }
@@ -61,7 +61,7 @@ public class Arrange extends AppCompatActivity {
                 }
                 break;
             case R.id.btnRotate:
-                checkRotate(myDraw.selectedForRotationSpaceship, Infrastructure.field);
+                rotate(myDraw.selectedForRotationSpaceship, Infrastructure.field);
                 myDraw.postInvalidate();
                 break;
         }
@@ -106,7 +106,7 @@ public class Arrange extends AppCompatActivity {
                 spaceships[6].takeSpaceShipInField(8, 4, field);
                 spaceships[7].takeSpaceShipInField(5, 5, field);
                 spaceships[8].takeSpaceShipInField(2, 7, field);
-                spaceships[9].takeSpaceShipInField(6, 8, field);
+                spaceships[9].takeSpaceShipInField(6, 7, field);
                 break;
             case 3:
                 spaceships[0].takeSpaceShipInField(6, 4, field);
@@ -135,9 +135,9 @@ public class Arrange extends AppCompatActivity {
         }
     }
 
-    //Переворачивает корабль
-    public void checkRotate(Spaceship selectedSpaceship, Field field) {
-        if (selectedSpaceship.isTaken) {
+    // Поворачивает корабль
+    public void rotate(Spaceship selectedSpaceship, Field field) {
+        if (selectedSpaceship.state == SpaceshipState.TAKEN) {
             selectedSpaceship.rotateSpaceship(field);
         } else {
             Toast toast = Toast.makeText(this, "Корабль не поставлен на поле", Toast.LENGTH_SHORT);

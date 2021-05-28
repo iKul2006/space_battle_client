@@ -20,7 +20,7 @@ import com.example.myapplication.model.Spaceship;
 import static com.example.myapplication.model.Infrastructure.field;
 import static com.example.myapplication.model.Infrastructure.spaceships;
 
-//Класс расстоновки кораблей
+// Класс расстановки кораблей
 public class MyDraw extends View {
     public Spaceship selectedSpaceship;
     public Spaceship selectedForRotationSpaceship;
@@ -42,36 +42,36 @@ public class MyDraw extends View {
         paint.setStyle(Paint.Style.FILL);
         cellSize = Infrastructure.cellSize(canvas);
 
-        //Рисует поле для расстоновки кораблей
+        // Рисует поле для расстановки кораблей
         field.draw(canvas, cellSize / 2, cellSize / 2, cellSize);
 
         drawSpaceships(canvas, cellSize);
 
         if (drawShip && selectedSpaceship != null && cellX != -1) {
-            selectedSpaceship.currentX = field.startX + cellX * cellSize;
-            selectedSpaceship.currentY = field.startY + cellY * cellSize;
+            selectedSpaceship.currentX = field.getStartX() + cellX * cellSize;
+            selectedSpaceship.currentY = field.getStartY() + cellY * cellSize;
             if (!field.spaceshipsInField.contains(selectedSpaceship)) {
                 field.spaceshipsInField.add(selectedSpaceship);
             }
 
-            //Закрашивает ненужный корабль
+            // Закрашивает ненужный корабль
             paint.setARGB(255, 55, 0, 179);
             paint.setStyle(Paint.Style.FILL_AND_STROKE);
             canvas.drawRect((float) selectedSpaceship.startX - 10, (float) selectedSpaceship.startY - 10,
-                    (float) (selectedSpaceship.startX + selectedSpaceship.cellCount * cellSize + 10),
+                    (float) (selectedSpaceship.startX + selectedSpaceship.getCellCount() * cellSize + 10),
                     (float) (selectedSpaceship.startY + cellSize + 10), paint);
             selectedSpaceship = null;
             cellX = -1;
             cellY = -1;
         }
 
-        //Отрисовывает корабли
+        // Отрисовывает корабли
         for (Spaceship ship : field.spaceshipsInField) {
             ship.draw(cellSize, canvas, ship.currentX, ship.currentY);
         }
     }
 
-    //Вычисляет, куда нажал пользователь и расставляет корабли
+    // Вычисляет, куда нажал пользователь и расставляет корабли
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
@@ -103,7 +103,7 @@ public class MyDraw extends View {
         return true;
     }
 
-    //Отрисовывает корабли
+    // Отрисовывает корабли
     private void drawSpaceships(Canvas canvas, double size) {
         for (int i = 0; i < spaceships.length; i++) {
             if (!field.spaceshipsInField.contains(spaceships[i])) {
@@ -112,7 +112,7 @@ public class MyDraw extends View {
         }
     }
 
-    //Вычисляет, куда нажали относительно клеток
+    // Вычисляет, куда нажали относительно клеток
     private boolean checkXY(float x, float y) {
         Integer a = field.findCell(x, y).first;
         Integer b = field.findCell(x, y).second;

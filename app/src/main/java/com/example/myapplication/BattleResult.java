@@ -56,8 +56,7 @@ public class BattleResult extends AppCompatActivity {
 
         int experience = player.levelExperience();
         exp.setText(String.valueOf(experience));
-
-        BattleDraw.isFinished = false;
+        Battle.finishActivity = false;
     }
 
     public void onClick(View v) {
@@ -66,6 +65,7 @@ public class BattleResult extends AppCompatActivity {
             case R.id.btnGoToMenu:
                 i = new Intent(this, MainActivity.class);
                 startActivity(i);
+                finish();
                 break;
         }
     }

@@ -7,26 +7,26 @@ import android.util.Pair;
 
 import java.util.ArrayList;
 
+// Класс поля игрока
 public class Field {
-    public int x = 10, y = 10;
-    public float startX, startY;
-    public float cellSize;
+    private int countX = 10, countY = 10; // количество клеток в поле
+    private float startX, startY;
+    private float cellSize;
     public Cell[][] cells;
     public ArrayList<Spaceship> spaceshipsInField = new ArrayList<>();
     public ArrayList<Cell> firedCells = new ArrayList<>();
     public ArrayList<Cell> notFiredCells = new ArrayList<>();
 
-    public Field () {
-        cells = new Cell[x][y];
-        for (int a = 0; a < x; a++) {
-            for (int b = 0; b < y; b++) {
+    Field() {
+        cells = new Cell[countX][countY];
+        for (int a = 0; a < countX; a++) {
+            for (int b = 0; b < countY; b++) {
                 cells[a][b] = new Cell(a, b, this);
             }
         }
-        this.cells = cells;
     }
 
-    //Рисует поле
+    // Рисует поле на заданной канве, начиная с точки startX, startY и клетки размером cellSize
     public void draw(Canvas canvas, float startX, float startY, float cellSize) {
         this.startX = startX;
         this.startY = startY;
@@ -54,6 +54,7 @@ public class Field {
         }
     }
 
+    // Находит клетку по координатам экрана x, y
     public Pair<Integer, Integer> findCell(float x, float y) {
         int a = (int) ((x - startX) / cellSize);
         int b = (int) ((y - startY) / cellSize);
@@ -66,7 +67,7 @@ public class Field {
         return new Pair<Integer, Integer>(a, b);
     }
 
-    //Возвращает id корабля, в который попали или 0 если не попали
+    // Возвращает id корабля, в который попали или 0 если не попали
     public int shoot(int cellX, int cellY) {
         //Если в клетке стоит корабль, добаляет ее в firedCells (клетки, которые закрашиваются красным)
         if (cells[cellX][cellY].idSpaceShip != 0) {
@@ -82,5 +83,17 @@ public class Field {
         }
         cells[cellX][cellY].shoot();
         return cells[cellX][cellY].idSpaceShip;
+    }
+
+    float getCellSize() {
+        return cellSize;
+    }
+
+    float getStartX() {
+        return startX;
+    }
+
+    float getStartY() {
+        return startY;
     }
 }

@@ -9,6 +9,7 @@
     tools:context=".MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ConstrL"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#00DB3C3C"
@@ -38,6 +39,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
+        android:id="@+id/llay"
         android:layout_width="400dp"
         android:layout_height="240dp"
         android:layout_marginTop="16dp"

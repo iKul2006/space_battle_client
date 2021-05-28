@@ -3,29 +3,23 @@ package com.example.myapplication.model;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PaintFlagsDrawFilter;
-import android.graphics.Rect;
-
-import com.example.myapplication.model.Field;
-import com.example.myapplication.model.Cell;
-import com.example.myapplication.model.SpaceshipState;
 
 import java.util.ArrayList;
 
+// Класс корабля
 public class Spaceship {
-    public int id;
-    public int cellCount;
+    public final int id;
+    private final int cellCount;
     public double startX;
     public double startY;
     public double currentX;
     public double currentY;
     public int currentCellX = -1;
     public int currentCellY = -1;
-    double size;
-    public boolean isTaken = false;
-    public boolean isRotated = false;
-    public SpaceshipState state = SpaceshipState.NORMAL;
-    public int damagedCells = 0;
+    private double cellSize;
+    public boolean isRotated = false; // = true, если корабль стоит вертикально, = false, если горизонтально
+    public SpaceshipState state = SpaceshipState.NORMAL; // состояние (начальное, поставлен на поле, ранен, убит)
+    public int damagedCells = 0; // количество поврежденных клеток корабля
 
     //Конструктор для расстановки кораблей соперником
     public Spaceship(int id, int cellCount) {
@@ -40,9 +34,15 @@ public class Spaceship {
         this.startY = startY;
     }
 
-    public void draw(double size, Canvas canvas, double x, double y) {
+    // Возращает количество клеток, занимаемых кораблем
+    public int getCellCount() {
+        return cellCount;
+    }
+
+    // Рисует корабль на канве, начиная с координаты (x,y)
+    public void draw(double cellSize, Canvas canvas, double x, double y) {
         //Здесь баг
-        this.size = size;
+        this.cellSize = cellSize;
         currentX = x;
         currentY = y;
         Paint p = new Paint();
@@ -55,27 +55,26 @@ public class Spaceship {
         canvas.drawRect((float) x, (float) y, (float) calculateRightX(x), (float) calculateBottomY(y), p);
     }
 
+    // Возвращает true, если точка с координатами (x,y) принадлежит кораблю
     public boolean isPointInSpaceship (double x, double y) {
         return (x >= currentX) && (x <= calculateRightX(currentX)) && (y >= currentY) && (y <= calculateBottomY(currentY));
     }
 
-    //Вычисляет конец корабля по X
+    // Вычисляет конец корабля по X
     private double calculateRightX(double x){
-        if (!isRotated) return x + cellCount * size;
-        else return x + size;
+        if (!isRotated) return x + cellCount * cellSize;
+        else return x + cellSize;
     }
 
-    //Вычисляет конец корабля по Y
+    // Вычисляет конец корабля по Y
     private double calculateBottomY(double y){
-        if (!isRotated) return y + size;
-        else return y + cellCount * size;
+        if (!isRotated) return y + cellSize;
+        else return y + cellCount * cellSize;
     }
 
-    public boolean takeSpaceShipInField(int x, int y, Field field) {
-        boolean isErrorCell = false;
-        int errorCell = 0;
-        //Ищет клетки поля, в которых стоит этот корабль (если он уже был поставлен на поле)
-        //Запоминает их в currentCells.
+    // Ищет клетки поля, в которых стоит этот корабль (если он уже был поставлен на поле)
+    // Запоминает их в currentCells.
+    private ArrayList<Cell> rememberOldPositions(Field field) {
         ArrayList<Cell> currentCells = new ArrayList<>();
         for (int ix = 0; ix < field.cells.length; ix++) {
             for (int iy = 0; iy < field.cells.length; iy++) {
@@ -84,31 +83,41 @@ public class Spaceship {
                 }
             }
         }
-        if (currentCellX == x && currentCellY == y){
-            currentCells.remove(field.cells[x][y]);
+        return currentCells;
+    }
+
+    private void clearCells(ArrayList<Cell> currentCells) {
+        for (Cell cell: currentCells) {
+            if (cell.idSpaceShip == id) {
+                cell.idSpaceShip = 0;
+            }
         }
+    }
+
+    // Ставит корабль на поле
+    public boolean takeSpaceShipInField(int x, int y, Field field) {
+        boolean isErrorCell = false;
+        int errorCell = 0;
+        // находит, где корабль находился раньше (если он уже стоял на поле)
+        ArrayList<Cell> currentCells = rememberOldPositions(field);
+
+        // чистит старое расположение корабля
+        clearCells(currentCells);
 
         //Пытается заполнить клетки поля собой. Если на корабль не входит в поле или он находится близко к другим кораблям
         //прерывает заполнение
         int j = isRotated ? y : x;
         for (int i = 0; i < cellCount; i++, j++, errorCell++) {
             boolean condition = false;
+            int count = field.cells.length;
             if (!isRotated) {
-                condition = j >= field.cells.length || y >= field.cells.length
-                        || (field.cells[j][y].idSpaceShip != 0 && field.cells[j][y].idSpaceShip != id);
+                condition = j >= count || y >= count || field.cells[j][y].idSpaceShip != 0;
             } else {
-                condition = j >= field.cells.length || x >= field.cells.length
-                        || (field.cells[x][j].idSpaceShip != 0 && field.cells[x][j].idSpaceShip != id);
+                condition = j >= count || x >= count || field.cells[x][j].idSpaceShip != 0;
             }
             if (condition) {
                 isErrorCell = true;
                 break;
-            } else {
-                if (isRotated) {
-                    field.cells[x][j].idSpaceShip = id;
-                } else {
-                    field.cells[j][y].idSpaceShip = id;
-                }
             }
 
             //Проверяет, касается ли клетка кораблей.
@@ -120,32 +129,40 @@ public class Spaceship {
             if (isErrorCell) {
                 break;
             }
+
+            if (isRotated) {
+                field.cells[x][j].idSpaceShip = id;
+            } else {
+                field.cells[j][y].idSpaceShip = id;
+            }
         }
 
         if (isErrorCell) {
+            // чистит клетки, которые поставил
             j--;
             for (int i = 0; i < errorCell; i++, j--) {
                if (!isRotated) {
-                   field.cells[j][y].idSpaceShip = 0;
+                   if (field.cells[j][y].idSpaceShip == id) {
+                       field.cells[j][y].idSpaceShip = 0;
+                   }
                } else {
-                   field.cells[x][j].idSpaceShip = 0;
+                   if (field.cells[x][j].idSpaceShip == id) {
+                       field.cells[x][j].idSpaceShip = 0;
+                   }
                }
             }
             return false;
         } else {
             currentCellX = x;
             currentCellY = y;
-            for (Cell cell: currentCells) {
-                cell.idSpaceShip = 0;
-            }
-            isTaken = true;
+            state = SpaceshipState.TAKEN;
             return true;
         }
     }
 
     private boolean checkIsValid(int x, int y, Field field) {
         if (x - 1 >= 0) {
-            if (field.cells[x - 1][y].idSpaceShip != 0 && field.cells[x - 1][y].idSpaceShip != field.cells[x][y].idSpaceShip && !isRotated) {
+            if (field.cells[x - 1][y].idSpaceShip != 0 && field.cells[x - 1][y].idSpaceShip != id) {
                 return true;
             }
             if (y - 1 >= 0) {
